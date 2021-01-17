@@ -11,11 +11,7 @@ db.run(
 );
 
 function addItem(id, password, author, pubDate) {
-  const questionMarks = [id];
-  console.log(questionMarks);
-  const placeholder = questionMarks.map((data) => '(?, ?, ?, ?)').join(',');
-  const sql =
-    "INSERT INTO items(id, password, author, pubDate) VALUES " + placeholder;
+  const sql =    "INSERT INTO items(id, password, author, pubDate) VALUES (?, ?, ?, ?);";
   db.run(sql, [id, password, author, pubDate], function (error) {
     if (error) {
       console.log(error);
@@ -30,7 +26,7 @@ function addItem(id, password, author, pubDate) {
   const newLinks = "https://reddit.com/r/wallstreetbets/new/.rss?limit=3";
   const newFeed = await parser.parseURL(newLinks);
   const rising =
-    "https://old.reddit.com/r/wallstreetbets/search.rss?q=tesla&restrict_sr=on&include_over_18=on&sort=relevance&t=week&limit=30";
+    "https://old.reddit.com/r/wallstreetbets/search.rss?q=tesla&restrict_sr=on&include_over_18=on&sort=relevance&t=week&limit=10";
   let risingFeed = await parser.parseURL(rising);
   const top = "https://reddit.com/r/wallstreetbets/top/.rss?limit=3";
   const topFeed = await parser.parseURL(top);
