@@ -7,12 +7,12 @@ db.on("trace", (message) => {
 });
 
 db.run(
-  "create table if not exists items (id text, author text, pubDate text, password text);"
+  "create table if not exists items (id text, title text, link text, pubDate text, author text, content text, contentSnippet text, isoDate text);"
 );
-
-function addItem(id, password, author, pubDate) {
-  const sql =    "INSERT INTO items(id, password, author, pubDate) VALUES (?, ?, ?, ?);";
-  db.run(sql, [id, password, author, pubDate], function (error) {
+  
+function addItem(id, title, link, pubDate, author, content, contentSnippet, isoDate) {
+  const sql =    "INSERT INTO items(id, title, link, pubDate, author, content, contentSnippet, isoDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+  db.run(sql, [id, title, link, pubDate, author, content, contentSnippet, isoDate], function (error) {
     if (error) {
       console.log(error);
     } else {
@@ -22,20 +22,27 @@ function addItem(id, password, author, pubDate) {
   });
 }
 
+var test = "gme";
+
 (async () => {
-  const newLinks = "https://reddit.com/r/wallstreetbets/new/.rss?limit=3";
-  const newFeed = await parser.parseURL(newLinks);
-  const rising =
-    "https://old.reddit.com/r/wallstreetbets/search.rss?q=tesla&restrict_sr=on&include_over_18=on&sort=relevance&t=week&limit=10";
-  let risingFeed = await parser.parseURL(rising);
-  const top = "https://reddit.com/r/wallstreetbets/top/.rss?limit=3";
-  const topFeed = await parser.parseURL(top);
-  const hot = "https://reddit.com/r/wallstreetbets/.rss?sort=hot&limit=3";
-  const hotFeed = await parser.parseURL(hot);
+  const hourFeed = await parser.parseURL(`https://old.reddit.com/r/wallstreetbets/search/.rss?q=${test}&include_over_18=on&restrict_sr=on&t=hour&limit=1`);
+  const dayFeed = await parser.parseURL(`https://old.reddit.com/r/wallstreetbets/search.rss?q=${test}&restrict_sr=on&include_over_18=on&sort=top&t=day&limit=1`);
+  const monthFeed = await parser.parseURL(`https://old.reddit.com/r/wallstreetbets/search.rss?q=${test}&restrict_sr=on&include_over_18=on&sort=top&t=month&limit=1`); 
+  const yearFeed = await parser.parseURL(`https://old.reddit.com/r/wallstreetbets/search.rss?q=${test}&restrict_sr=on&include_over_18=on&sort=top&t=year&limit=1`);  
+  
+  hourFeed.items.forEach((item) => {
+    addItem(item.id, item.title, item.link, item.pubDate, item.author, item.content, item.contentSnippet, item.isoDate);
+      });
 
-  const password = "i love lamp";
+  dayFeed.items.forEach((item) => {    
+    addItem(item.id, item.title, item.link, item.pubDate, item.author, item.content, item.contentSnippet, item.isoDate);
+     });
+  
+  monthFeed.items.forEach((item) => {    
+    addItem(item.id, item.title, item.link, item.pubDate, item.author, item.content, item.contentSnippet, item.isoDate);
+     });
 
-  risingFeed.items.forEach((item) => {
-    addItem(item.id, password, item.author, item.pubDate);
-  });
+  yearFeed.items.forEach((item) => {    
+    addItem(item.id, item.title, item.link, item.pubDate, item.author, item.content, item.contentSnippet, item.isoDate);
+     });
 })();
